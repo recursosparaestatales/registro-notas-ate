@@ -5,98 +5,171 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro de Notas - ATE Mendoza</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Estilos personalizados basados en la paleta proporcionada */
+    :root {
+      --color-primary: #38B000;
+      --color-bg-soft: #E0F9CF;
+      --color-text: #000000;
+    }
+    body {
+      background-color: #f4f7f2;
+      color: var(--color-text);
+    }
+    .bg-primary-custom { background-color: var(--color-primary); }
+    .text-primary-custom { color: var(--color-primary); }
+    .border-primary-custom { border-color: var(--color-primary); }
+    .bg-soft-custom { background-color: var(--color-bg-soft); }
+    
+    /* Estilo para impresión limpia al exportar PDF */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #sec-consultar, #sec-consultar * {
+        visibility: visible;
+      }
+      #sec-consultar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        padding: 0;
+        box-shadow: none;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans p-4 md:p-8">
+<body class="font-sans p-4 md:p-8">
 
   <!-- PANTALLA DE ACCESO (LOGIN) -->
-  <div id="pantalla-login" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-20">
-    <h2 class="text-2xl font-bold text-center text-blue-900 mb-4">🔐 Acceso Restringido</h2>
-    <p class="text-sm text-gray-600 text-center mb-6">Ingresa la contraseña para acceder al sistema de notas.</p>
+  <div id="pantalla-login" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-20 border-t-8 border-primary-custom">
+    <div class="text-center mb-6">
+      <!-- Logo Institucional -->
+      <img src="https://drive.google.com/file/d/1wny2OSKUsjG0gGNV-nHfdnmZCjfb4sMB/view?usp=sharing" alt="Logo ATE Mendoza" class="mx-auto h-14 mb-3 object-contain">
+      <h2 class="text-2xl font-bold text-gray-900">Acceso Restringido</h2>
+      <p class="text-sm text-gray-600 mt-1">Sistema de Registro de Notas - ATE Mendoza</p>
+    </div>
     <form onsubmit="verificarPassword(event)" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700">Contraseña</label>
-        <input type="password" id="inputPassword" required class="w-full border p-2 rounded mt-1 focus:ring-2 focus:ring-blue-500">
+        <label class="block text-sm font-semibold text-gray-700">Contraseña</label>
+        <input type="password" id="inputPassword" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
       </div>
-      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">
-        Ingresar
+      <button type="submit" class="w-full bg-primary-custom text-white p-3 rounded-lg font-bold hover:opacity-90 transition">
+        Ingresar al Sistema
       </button>
       <p id="errorLogin" class="text-red-600 text-center text-sm font-semibold hidden">Contraseña incorrecta.</p>
     </form>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL (OCULTA HASTA INICIAR SESIÓN) -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-principal" class="max-w-4xl mx-auto hidden">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl md:text-3xl font-bold text-blue-900">
-        Sistema de Registro de Notas - ATE Mendoza
-      </h1>
-      <button onclick="cerrarSesion()" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+    
+    <!-- Cabecera institucional -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border-l-8 border-primary-custom gap-4">
+      <div class="flex items-center space-x-4">
+        <!-- Logo Institucional -->
+        <img src="https://via.placeholder.com/120x50?text=ATE+MENDOZA" alt="Logo" class="h-12 object-contain">
+        <div>
+          <h1 class="text-lg md:text-xl font-bold text-gray-900">CDP ATE Mendoza</h1>
+          <p class="text-xs text-gray-500">Gestión y Registro de Notas</p>
+        </div>
+      </div>
+      <button onclick="cerrarSesion()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm hover:bg-gray-300 font-semibold transition">
         Cerrar Sesión
       </button>
     </div>
 
-    <!-- Botones de Navegación -->
-    <div class="flex justify-center space-x-4 mb-6">
-      <button onclick="mostrarSeccion('ingresar')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold">
-        ➕ Ingresar Datos
-      </button>
-      <button onclick="mostrarSeccion('consultar'); cargarDatos();" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-semibold">
-        🔍 Consultar Datos
-      </button>
+    <!-- MENÚ PRINCIPAL (Opciones iniciales) -->
+    <div id="sec-menu" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <div onclick="mostrarSeccion('ingresar')" class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl cursor-pointer border-t-8 border-primary-custom transition text-center group">
+        <div class="text-4xl mb-3 group-hover:scale-110 transition transform">➕</div>
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Ingresar Datos</h2>
+        <p class="text-gray-600 text-sm">Registra una nueva nota, expediente o trámite institucional.</p>
+      </div>
+
+      <div onclick="mostrarSeccion('consultar'); cargarDatos();" class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl cursor-pointer border-t-8 border-green-600 transition text-center group">
+        <div class="text-4xl mb-3 group-hover:scale-110 transition transform">🔍</div>
+        <h2 class="text-xl font-bold text-gray-900 mb-2">Consultar Datos</h2>
+        <p class="text-gray-600 text-sm">Busca, filtra, revisa y exporta las notas guardadas.</p>
+      </div>
     </div>
 
     <!-- SECCIÓN 1: FORMULARIO DE INGRESO -->
-    <div id="sec-ingresar" class="bg-white p-6 rounded-lg shadow-md">
-      <h2 class="text-xl font-bold mb-4 text-gray-800">Nueva Nota</h2>
+    <div id="sec-ingresar" class="bg-white p-6 md:p-8 rounded-xl shadow-md hidden border-t-4 border-primary-custom">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-900">➕ Nuevo Registro de Nota</h2>
+        <button onclick="mostrarSeccion('menu')" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 font-medium transition">
+          ⬅️ Volver al Menú
+        </button>
+      </div>
+
       <form id="formNota" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Ministerio / Repartición</label>
-          <input type="text" id="ministerio" required class="w-full border p-2 rounded mt-1">
+          <label class="block text-sm font-semibold text-gray-700">Ministerio / Repartición</label>
+          <input type="text" id="ministerio" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Ticket N°</label>
-          <input type="number" id="ticket" required class="w-full border p-2 rounded mt-1">
+          <label class="block text-sm font-semibold text-gray-700">Ticket N°</label>
+          <input type="number" id="ticket" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Expediente</label>
-          <input type="text" id="expediente" placeholder="EX-2025-..." required class="w-full border p-2 rounded mt-1">
+          <label class="block text-sm font-semibold text-gray-700">Expediente</label>
+          <input type="text" id="expediente" placeholder="EX-2025-..." required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Tema / Observación</label>
-          <textarea id="tema" required class="w-full border p-2 rounded mt-1" rows="3"></textarea>
+          <label class="block text-sm font-semibold text-gray-700">Tema / Observación</label>
+          <textarea id="tema" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none" rows="3"></textarea>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Etiquetas</label>
-          <input type="text" id="etiquetas" placeholder="Ej: Paritarias, Licencia" class="w-full border p-2 rounded mt-1">
+          <label class="block text-sm font-semibold text-gray-700">Etiquetas</label>
+          <input type="text" id="etiquetas" placeholder="Ej: Paritarias, Licencia" class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">
-          Guardar Registro
+        <button type="submit" class="w-full bg-primary-custom text-white p-3 rounded-lg font-bold hover:opacity-90 transition">
+          Guardar Registro en Planilla
         </button>
       </form>
       <div id="mensaje" class="mt-4 text-center font-semibold"></div>
     </div>
 
     <!-- SECCIÓN 2: CONSULTA DE DATOS -->
-    <div id="sec-consultar" class="bg-white p-6 rounded-lg shadow-md hidden">
-      <h2 class="text-xl font-bold mb-4 text-gray-800">Registros Guardados</h2>
-      <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por tema, expediente o ministerio..." class="w-full border p-2 rounded mb-4">
+    <div id="sec-consultar" class="bg-white p-6 md:p-8 rounded-xl shadow-md hidden border-t-4 border-green-600">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-950">🔍 Consultar Registros</h2>
+        <div class="flex gap-2">
+          <button onclick="window.print()" class="no-print bg-primary-custom text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 font-semibold transition flex items-center gap-2">
+            📥 Descargar PDF
+          </button>
+          <button onclick="mostrarSeccion('menu')" class="no-print bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 font-medium transition">
+            ⬅️ Volver
+          </button>
+        </div>
+      </div>
+
+      <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por tema, expediente, ministerio o etiquetas..." class="no-print w-full border border-gray-300 p-3 rounded-lg mb-4 focus:ring-2 focus:ring-green-500 outline-none">
+      
       <div class="overflow-x-auto">
         <table class="w-full border-collapse border border-gray-300 text-sm">
           <thead>
-            <tr class="bg-gray-200 text-left">
-              <th class="border p-2">Ministerio</th>
-              <th class="border p-2">Ticket</th>
-              <th class="border p-2">Expediente</th>
-              <th class="border p-2">Tema / Obs</th>
-              <th class="border p-2">Etiquetas</th>
+            <tr class="bg-soft-custom text-gray-900 text-left">
+              <th class="border border-gray-300 p-3">Ministerio</th>
+              <th class="border border-gray-300 p-3">Ticket</th>
+              <th class="border border-gray-300 p-3">Expediente</th>
+              <th class="border border-gray-300 p-3">Tema / Obs</th>
+              <th class="border border-gray-300 p-3">Etiquetas</th>
             </tr>
           </thead>
           <tbody id="cuerpoTabla">
-            <tr><td colspan="5" class="text-center p-4">Cargando datos...</td></tr>
+            <tr><td colspan="5" class="text-center p-6 text-gray-500">Cargando datos...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </div>
 
   <script>
@@ -104,7 +177,6 @@
     const CONTRASEÑA_CORRECTA = "BELGRANO1358#"; 
     const API_URL = "https://script.google.com/macros/s/AKfycbzMcLCbJTA-nHoCt7rzvrRgvowAuR_eU3LHBpFHf5vCQ1NQpz5r0w7aFaJu8NMEEmHO/exec";
 
-    // Validar si ya inició sesión antes en este navegador
     window.onload = function() {
       if (sessionStorage.getItem("sesion_autorizada") === "true") {
         mostrarApp();
@@ -125,6 +197,7 @@
     function mostrarApp() {
       document.getElementById('pantalla-login').classList.add('hidden');
       document.getElementById('app-principal').classList.remove('hidden');
+      mostrarSeccion('menu');
     }
 
     function cerrarSesion() {
@@ -133,6 +206,7 @@
     }
 
     function mostrarSeccion(seccion) {
+      document.getElementById('sec-menu').classList.add('hidden');
       document.getElementById('sec-ingresar').classList.add('hidden');
       document.getElementById('sec-consultar').classList.add('hidden');
       document.getElementById('sec-' + seccion).classList.remove('hidden');
@@ -140,7 +214,7 @@
 
     async function cargarDatos() {
       const tabla = document.getElementById('cuerpoTabla');
-      tabla.innerHTML = '<tr><td colspan="5" class="text-center p-4">Cargando registros...</td></tr>';
+      tabla.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-gray-500">Cargando registros...</td></tr>';
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
@@ -148,20 +222,17 @@
         data.reverse().forEach(row => {
           tabla.innerHTML += `
             <tr class="hover:bg-gray-50">
-              <td class="border p-2">${row['MINISTERIO'] || ''}</td>
-              <td class="border p-2">${row['TICKET'] || ''}</td>
-              <td class="border p-2 font-mono text-xs">${row['EXPEDIENTE'] || ''}</td>
-              <td class="border p-2">${row['TEMA/OBS'] || ''}</td>
-              <td class="border p-2">${row['ETIQUETAS'] || ''}</td>
+              <td class="border border-gray-300 p-3">${row['MINISTERIO'] || ''}</td>
+              <td class="border border-gray-300 p-3">${row['TICKET'] || ''}</td>
+              <td class="border border-gray-300 p-3 font-mono text-xs">${row['EXPEDIENTE'] || ''}</td>
+              <td class="border border-gray-300 p-3">${row['TEMA/OBS'] || ''}</td>
+              <td class="border border-gray-300 p-3">${row['ETIQUETAS'] || ''}</td>
             </tr>
           `;
         });
-        
-        // 🔍 Aplicar el filtro inmediatamente después de cargar los datos
         filtrarTabla();
-
       } catch (err) {
-        tabla.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-600">Error al cargar datos</td></tr>';
+        tabla.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-red-600">Error al cargar datos</td></tr>';
       }
     }
 
@@ -169,7 +240,7 @@
       e.preventDefault();
       const msg = document.getElementById('mensaje');
       msg.innerText = "Guardando...";
-      msg.className = "mt-4 text-center font-semibold text-blue-600";
+      msg.className = "mt-4 text-center font-semibold text-green-700";
 
       const payload = {
         ministerio: document.getElementById('ministerio').value,
