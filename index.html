@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <!-- Etiquetas para Vista Previa en WhatsApp y Redes Sociales -->
-  <meta property="og:title" content="Sistema de Registro de Notas - ATE Mendoza">
-  <meta property="og:description" content="Plataforma institucional de gestión y consulta de notas y expedientes.">
-  <meta property="og:image" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeEj6_EKY10tpmi7Jxipr2UyXdPcFMdHlL10NENH1KsA&s">
-  <meta property="og:url" content="https://tu-usuario.github.io/registro-notas-ate/">
-  <meta property="og:type" content="website">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro de Notas - ATE Mendoza</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Estilos personalizados basados en la paleta proporcionada */
     :root {
       --color-primary: #38B000;
       --color-bg-soft: #E0F9CF;
@@ -27,26 +20,11 @@
     .border-primary-custom { border-color: var(--color-primary); }
     .bg-soft-custom { background-color: var(--color-bg-soft); }
     
-    /* Estilo para impresión limpia al exportar PDF */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #sec-consultar, #sec-consultar * {
-        visibility: visible;
-      }
-      #sec-consultar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        background: white;
-        padding: 0;
-        box-shadow: none;
-      }
-      .no-print {
-        display: none !important;
-      }
+      body * { visibility: hidden; }
+      #sec-consultar, #sec-consultar * { visibility: visible; }
+      #sec-consultar { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 0; box-shadow: none; }
+      .no-print { display: none !important; }
     }
   </style>
 </head>
@@ -55,7 +33,6 @@
   <!-- PANTALLA DE ACCESO (LOGIN) -->
   <div id="pantalla-login" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-20 border-t-8 border-primary-custom">
     <div class="text-center mb-6">
-      <!-- Logo Institucional -->
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeEj6_EKY10tpmi7Jxipr2UyXdPcFMdHlL10NENH1KsA&s" alt="Logo ATE Mendoza" class="mx-auto h-14 mb-3 object-contain">
       <h2 class="text-2xl font-bold text-gray-900">Acceso Restringido</h2>
       <p class="text-sm text-gray-600 mt-1">Sistema de Registro de Notas - ATE Mendoza</p>
@@ -80,10 +57,8 @@
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-principal" class="max-w-4xl mx-auto hidden">
     
-    <!-- Cabecera institucional -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border-l-8 border-primary-custom gap-4">
       <div class="flex items-center space-x-4">
-        <!-- Logo Institucional -->
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQeEj6_EKY10tpmi7Jxipr2UyXdPcFMdHlL10NENH1KsA&s" alt="Logo" class="h-12 object-contain">
         <div>
           <h1 class="text-lg md:text-xl font-bold text-gray-900">CDP ATE Mendoza</h1>
@@ -95,9 +70,9 @@
       </button>
     </div>
 
-    <!-- MENÚ PRINCIPAL (Opciones iniciales) -->
+    <!-- MENÚ PRINCIPAL -->
     <div id="sec-menu" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-      <div onclick="mostrarSeccion('ingresar')" class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl cursor-pointer border-t-8 border-primary-custom transition text-center group">
+      <div onclick="prepararNuevoRegistro()" class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl cursor-pointer border-t-8 border-primary-custom transition text-center group">
         <div class="text-4xl mb-3 group-hover:scale-110 transition transform">➕</div>
         <h2 class="text-xl font-bold text-gray-900 mb-2">Ingresar Datos</h2>
         <p class="text-gray-600 text-sm">Registra una nueva nota, expediente o trámite institucional.</p>
@@ -110,10 +85,10 @@
       </div>
     </div>
 
-    <!-- SECCIÓN 1: FORMULARIO DE INGRESO -->
+    <!-- SECCIÓN 1: FORMULARIO DE INGRESO / EDICIÓN -->
     <div id="sec-ingresar" class="bg-white p-6 md:p-8 rounded-xl shadow-md hidden border-t-4 border-primary-custom">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-gray-900">➕ Nuevo Registro de Nota</h2>
+        <h2 id="tituloFormulario" class="text-xl font-bold text-gray-900">➕ Nuevo Registro de Nota</h2>
         <button onclick="mostrarSeccion('menu')" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm hover:bg-gray-200 font-medium transition">
           ⬅️ Volver al Menú
         </button>
@@ -125,7 +100,7 @@
           <input type="text" id="ministerio" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
-          <label class="block text-sm font-semibold text-gray-700">Ticket N°</label>
+          <label class="block text-sm font-semibold text-gray-700">Ticket N° (Identificador único)</label>
           <input type="number" id="ticket" required class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div>
@@ -140,7 +115,7 @@
           <label class="block text-sm font-semibold text-gray-700">Etiquetas</label>
           <input type="text" id="etiquetas" placeholder="Ej: Paritarias, Licencia" class="w-full border border-gray-300 p-3 rounded-lg mt-1 focus:ring-2 focus:ring-green-500 outline-none">
         </div>
-        <button type="submit" class="w-full bg-primary-custom text-white p-3 rounded-lg font-bold hover:opacity-90 transition">
+        <button type="submit" id="btnGuardar" class="w-full bg-primary-custom text-white p-3 rounded-lg font-bold hover:opacity-90 transition">
           Guardar Registro en Planilla
         </button>
       </form>
@@ -150,7 +125,7 @@
     <!-- SECCIÓN 2: CONSULTA DE DATOS -->
     <div id="sec-consultar" class="bg-white p-6 md:p-8 rounded-xl shadow-md hidden border-t-4 border-green-600">
       <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold text-gray-950">🔍 Consultar Registros</h2>
+        <h2 class="text-xl font-bold text-gray-950">🔍 Consultar y Editar Registros</h2>
         <div class="flex gap-2">
           <button onclick="window.print()" class="no-print bg-primary-custom text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 font-semibold transition flex items-center gap-2">
             📥 Descargar PDF
@@ -172,10 +147,11 @@
               <th class="border border-gray-300 p-3">Expediente</th>
               <th class="border border-gray-300 p-3">Tema / Obs</th>
               <th class="border border-gray-300 p-3">Etiquetas</th>
+              <th class="no-print border border-gray-300 p-3 text-center">Acción</th>
             </tr>
           </thead>
           <tbody id="cuerpoTabla">
-            <tr><td colspan="5" class="text-center p-6 text-gray-500">Cargando datos...</td></tr>
+            <tr><td colspan="6" class="text-center p-6 text-gray-500">Cargando datos...</td></tr>
           </tbody>
         </table>
       </div>
@@ -184,9 +160,10 @@
   </div>
 
   <script>
-    // ⚠️ CONFIGURACIÓN
     const CONTRASEÑA_CORRECTA = "BELGRANO1358#"; 
     const API_URL = "https://script.google.com/macros/s/AKfycbzMcLCbJTA-nHoCt7rzvrRgvowAuR_eU3LHBpFHf5vCQ1NQpz5r0w7aFaJu8NMEEmHO/exec";
+
+    let modoEdicion = false; // Controla si estamos creando o editando
 
     window.onload = function() {
       if (sessionStorage.getItem("sesion_autorizada") === "true") {
@@ -194,7 +171,6 @@
       }
     };
 
-    // Función para alternar la visibilidad de la contraseña
     function togglePassword() {
       const inputPass = document.getElementById('inputPassword');
       const iconoOjo = document.getElementById('iconoOjo');
@@ -236,37 +212,79 @@
       document.getElementById('sec-' + seccion).classList.remove('hidden');
     }
 
+    function prepararNuevoRegistro() {
+      modoEdicion = false;
+      document.getElementById('tituloFormulario').innerText = "➕ Nuevo Registro de Nota";
+      document.getElementById('btnGuardar').innerText = "Guardar Registro en Planilla";
+      document.getElementById('ticket').disabled = false; // Permitir escribir ticket nuevo
+      document.getElementById('formNota').reset();
+      document.getElementById('mensaje').innerText = "";
+      mostrarSeccion('ingresar');
+    }
+
+    function prepararEdicion(ministerio, ticket, expediente, tema, etiquetas) {
+      modoEdicion = true;
+      document.getElementById('tituloFormulario').innerText = "✏️ Editar Registro (Ticket N° " + ticket + ")";
+      document.getElementById('btnGuardar').innerText = "Actualizar Registro";
+      
+      // Rellenar campos
+      document.getElementById('ministerio').value = ministerio;
+      document.getElementById('ticket').value = ticket;
+      document.getElementById('ticket').disabled = true; // El ticket no se cambia porque es la clave de búsqueda
+      document.getElementById('expediente').value = expediente;
+      document.getElementById('tema').value = tema;
+      document.getElementById('etiquetas').value = etiquetas;
+      
+      document.getElementById('mensaje').innerText = "";
+      mostrarSeccion('ingresar');
+    }
+
     async function cargarDatos() {
       const tabla = document.getElementById('cuerpoTabla');
-      tabla.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-gray-500">Cargando registros...</td></tr>';
+      tabla.innerHTML = '<tr><td colspan="6" class="text-center p-6 text-gray-500">Cargando registros...</td></tr>';
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
         tabla.innerHTML = '';
         data.reverse().forEach(row => {
+          const min = row['MINISTERIO'] || '';
+          const tic = row['TICKET'] || '';
+          const exp = row['EXPEDIENTE'] || '';
+          const tem = row['TEMA/OBS'] || '';
+          const eti = row['ETIQUETAS'] || '';
+
           tabla.innerHTML += `
             <tr class="hover:bg-gray-50">
-              <td class="border border-gray-300 p-3">${row['MINISTERIO'] || ''}</td>
-              <td class="border border-gray-300 p-3">${row['TICKET'] || ''}</td>
-              <td class="border border-gray-300 p-3 font-mono text-xs">${row['EXPEDIENTE'] || ''}</td>
-              <td class="border border-gray-300 p-3">${row['TEMA/OBS'] || ''}</td>
-              <td class="border border-gray-300 p-3">${row['ETIQUETAS'] || ''}</td>
+              <td class="border border-gray-300 p-3">${min}</td>
+              <td class="border border-gray-300 p-3 font-semibold">${tic}</td>
+              <td class="border border-gray-300 p-3 font-mono text-xs">${exp}</td>
+              <td class="border border-gray-300 p-3">${tem}</td>
+              <td class="border border-gray-300 p-3">${eti}</td>
+              <td class="no-print border border-gray-300 p-3 text-center">
+                <button onclick="prepararEdicion('${min.replace(/'/g, "")}', '${tic}', '${exp.replace(/'/g, "")}', '${tem.replace(/'/g, "").replace(/\n/g, " ")}', '${eti.replace(/'/g, "")}')" class="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 font-semibold">
+                  ✏️ Editar
+                </button>
+              </td>
             </tr>
           `;
         });
         filtrarTabla();
       } catch (err) {
-        tabla.innerHTML = '<tr><td colspan="5" class="text-center p-6 text-red-600">Error al cargar datos</td></tr>';
+        tabla.innerHTML = '<tr><td colspan="6" class="text-center p-6 text-red-600">Error al cargar datos</td></tr>';
       }
     }
 
     document.getElementById('formNota').addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = document.getElementById('mensaje');
-      msg.innerText = "Guardando...";
+      msg.innerText = modoEdicion ? "Actualizando..." : "Guardando...";
       msg.className = "mt-4 text-center font-semibold text-green-700";
 
+      // Habilitar temporalmente el ticket para que se incluya en el envío si está en modo edición
+      document.getElementById('ticket').disabled = false;
+
       const payload = {
+        action: modoEdicion ? "update" : "create",
         ministerio: document.getElementById('ministerio').value,
         ticket: document.getElementById('ticket').value,
         expediente: document.getElementById('expediente').value,
@@ -282,11 +300,16 @@
           body: JSON.stringify(payload)
         });
 
-        msg.innerText = "✅ ¡Registro guardado con éxito!";
+        msg.innerText = modoEdicion ? "✅ ¡Registro actualizado con éxito!" : "✅ ¡Registro guardado con éxito!";
         msg.className = "mt-4 text-center font-semibold text-green-600";
-        document.getElementById('formNota').reset();
+        
+        if (modoEdicion) {
+          document.getElementById('ticket').disabled = true;
+        } else {
+          document.getElementById('formNota').reset();
+        }
       } catch (err) {
-        msg.innerText = "❌ Error al guardar los datos";
+        msg.innerText = "❌ Error al procesar los datos";
         msg.className = "mt-4 text-center font-semibold text-red-600";
       }
     });
