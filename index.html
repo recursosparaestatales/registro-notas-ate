@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Notas - ATE Mendoza</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-4 md:p-8">
+
+  <!-- PANTALLA DE ACCESO (LOGIN) -->
+  <div id="pantalla-login" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-20">
+    <h2 class="text-2xl font-bold text-center text-blue-900 mb-4">🔐 Acceso Restringido</h2>
+    <p class="text-sm text-gray-600 text-center mb-6">Ingresa la contraseña para acceder al sistema de notas.</p>
+    <form onsubmit="verificarPassword(event)" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+        <input type="password" id="inputPassword" required class="w-full border p-2 rounded mt-1 focus:ring-2 focus:ring-blue-500">
+      </div>
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">
+        Ingresar
+      </button>
+      <p id="errorLogin" class="text-red-600 text-center text-sm font-semibold hidden">Contraseña incorrecta.</p>
+    </form>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL (OCULTA HASTA INICIAR SESIÓN) -->
+  <div id="app-principal" class="max-w-4xl mx-auto hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl md:text-3xl font-bold text-blue-900">
+        Sistema de Registro de Notas - ATE Mendoza
+      </h1>
+      <button onclick="cerrarSesion()" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+        Cerrar Sesión
+      </button>
+    </div>
+
+    <!-- Botones de Navegación -->
+    <div class="flex justify-center space-x-4 mb-6">
+      <button onclick="mostrarSeccion('ingresar')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold">
+        ➕ Ingresar Datos
+      </button>
+      <button onclick="mostrarSeccion('consultar'); cargarDatos();" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 font-semibold">
+        🔍 Consultar Datos
+      </button>
+    </div>
+
+    <!-- SECCIÓN 1: FORMULARIO DE INGRESO -->
+    <div id="sec-ingresar" class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Nueva Nota</h2>
+      <form id="formNota" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Ministerio / Repartición</label>
+          <input type="text" id="ministerio" required class="w-full border p-2 rounded mt-1">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Ticket N°</label>
+          <input type="number" id="ticket" required class="w-full border p-2 rounded mt-1">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Expediente</label>
+          <input type="text" id="expediente" placeholder="EX-2025-..." required class="w-full border p-2 rounded mt-1">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Tema / Observación</label>
+          <textarea id="tema" required class="w-full border p-2 rounded mt-1" rows="3"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Etiquetas</label>
+          <input type="text" id="etiquetas" placeholder="Ej: Paritarias, Licencia" class="w-full border p-2 rounded mt-1">
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">
+          Guardar Registro
+        </button>
+      </form>
+      <div id="mensaje" class="mt-4 text-center font-semibold"></div>
+    </div>
+
+    <!-- SECCIÓN 2: CONSULTA DE DATOS -->
+    <div id="sec-consultar" class="bg-white p-6 rounded-lg shadow-md hidden">
+      <h2 class="text-xl font-bold mb-4 text-gray-800">Registros Guardados</h2>
+      <input type="text" id="buscador" onkeyup="filtrarTabla()" placeholder="Buscar por tema, expediente o ministerio..." class="w-full border p-2 rounded mb-4">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 text-sm">
+          <thead>
+            <tr class="bg-gray-200 text-left">
+              <th class="border p-2">Ministerio</th>
+              <th class="border p-2">Ticket</th>
+              <th class="border p-2">Expediente</th>
+              <th class="border p-2">Tema / Obs</th>
+              <th class="border p-2">Etiquetas</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla">
+            <tr><td colspan="5" class="text-center p-4">Cargando datos...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ CONFIGURACIÓN
+    const CONTRASEÑA_CORRECTA = BELGRANO1358#; // Cambia esto por tu clave
+    const API_URL = https://script.google.com/macros/s/AKfycbzMcLCbJTA-nHoCt7rzvrRgvowAuR_eU3LHBpFHf5vCQ1NQpz5r0w7aFaJu8NMEEmHO/exec;
+
+    // Validar si ya inició sesión antes en este navegador
+    window.onload = function() {
+      if (sessionStorage.getItem("sesion_autorizada") === "true") {
+        mostrarApp();
+      }
+    };
+
+    function verificarPassword(e) {
+      e.preventDefault();
+      const pass = document.getElementById('inputPassword').value;
+      if (pass === CONTRASEÑA_CORRECTA) {
+        sessionStorage.setItem("sesion_autorizada", "true");
+        mostrarApp();
+      } else {
+        document.getElementById('errorLogin').classList.remove('hidden');
+      }
+    }
+
+    function mostrarApp() {
+      document.getElementById('pantalla-login').classList.add('hidden');
+      document.getElementById('app-principal').classList.remove('hidden');
+    }
+
+    function cerrarSesion() {
+      sessionStorage.removeItem("sesion_autorizada");
+      location.reload();
+    }
+
+    function mostrarSeccion(seccion) {
+      document.getElementById('sec-ingresar').classList.add('hidden');
+      document.getElementById('sec-consultar').classList.add('hidden');
+      document.getElementById('sec-' + seccion).classList.remove('hidden');
+    }
+
+    async function cargarDatos() {
+      const tabla = document.getElementById('cuerpoTabla');
+      tabla.innerHTML = '<tr><td colspan="5" class="text-center p-4">Cargando registros...</td></tr>';
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        tabla.innerHTML = '';
+        data.reverse().forEach(row => {
+          tabla.innerHTML += `
+            <tr class="hover:bg-gray-50">
+              <td class="border p-2">${row['MINISTERIO'] || ''}</td>
+              <td class="border p-2">${row['TICKET'] || ''}</td>
+              <td class="border p-2 font-mono text-xs">${row['EXPEDIENTE'] || ''}</td>
+              <td class="border p-2">${row['TEMA/OBS'] || ''}</td>
+              <td class="border p-2">${row['ETIQUETAS'] || ''}</td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        tabla.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-600">Error al cargar datos</td></tr>';
+      }
+    }
+
+    document.getElementById('formNota').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('mensaje');
+      msg.innerText = "Guardando...";
+      msg.className = "mt-4 text-center font-semibold text-blue-600";
+
+      const payload = {
+        ministerio: document.getElementById('ministerio').value,
+        ticket: document.getElementById('ticket').value,
+        expediente: document.getElementById('expediente').value,
+        tema: document.getElementById('tema').value,
+        etiquetas: document.getElementById('etiquetas').value
+      };
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        msg.innerText = "✅ ¡Registro guardado con éxito!";
+        msg.className = "mt-4 text-center font-semibold text-green-600";
+        document.getElementById('formNota').reset();
+      } catch (err) {
+        msg.innerText = "❌ Error al guardar los datos";
+        msg.className = "mt-4 text-center font-semibold text-red-600";
+      }
+    });
+
+    function filtrarTabla() {
+      const texto = document.getElementById('buscador').value.toLowerCase();
+      const filas = document.querySelectorAll('#cuerpoTabla tr');
+      filas.forEach(fila => {
+        const contenido = fila.innerText.toLowerCase();
+        fila.style.display = contenido.includes(texto) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>
