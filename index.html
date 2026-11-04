@@ -100,7 +100,7 @@
   </div>
 
   <script>
-    // ⚠️ CONFIGURACIÓN CORREGIDA (CON COMILLAS)
+    // ⚠️ CONFIGURACIÓN
     const CONTRASEÑA_CORRECTA = "BELGRANO1358#"; 
     const API_URL = "https://script.google.com/macros/s/AKfycbzMcLCbJTA-nHoCt7rzvrRgvowAuR_eU3LHBpFHf5vCQ1NQpz5r0w7aFaJu8NMEEmHO/exec";
 
@@ -156,6 +156,10 @@
             </tr>
           `;
         });
+        
+        // 🔍 Aplicar el filtro inmediatamente después de cargar los datos
+        filtrarTabla();
+
       } catch (err) {
         tabla.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-red-600">Error al cargar datos</td></tr>';
       }
