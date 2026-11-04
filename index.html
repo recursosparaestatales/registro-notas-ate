@@ -299,6 +299,37 @@
           body: JSON.stringify(payload)
         });
 
+        if (modoEdicion) {
+          msg.innerText = "✅ ¡Registro actualizado con éxito! Volviendo...";
+          msg.className = "mt-4 text-center font-semibold text-green-600";
+          setTimeout(() => {
+            mostrarSeccion('consultar');
+            cargarDatos();
+          }, 1500);
+        } else {
+          // 🚀 MODO CARGA EN TANDA: Limpia y avisa sin salir de la pantalla
+          msg.innerText = "✅ ¡Guardado! Ya podés cargar el siguiente.";
+          msg.className = "mt-4 text-center font-semibold text-green-600";
+          document.getElementById('formNota').reset();
+          
+          // Oculta el mensaje a los 3 segundos para que quede limpio
+          setTimeout(() => { msg.innerText = ""; }, 3000);
+        }
+
+      } catch (err) {
+        msg.innerText = "❌ Error al procesar los datos";
+        msg.className = "mt-4 text-center font-semibold text-red-600";
+      }
+    });};
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
         msg.innerText = modoEdicion ? "✅ ¡Registro actualizado con éxito!" : "✅ ¡Registro guardado con éxito!";
         msg.className = "mt-4 text-center font-semibold text-green-600";
         
